@@ -1,0 +1,8 @@
+name: React Components
+description: Module for React code
+package: Custom
+core: 8.x
+core_version_requirement: ^10
+type: module
+dependencies:
+  - paragraphs

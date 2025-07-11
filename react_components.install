@@ -1,0 +1,205 @@
+<?php
+
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\paragraphs\Entity\ParagraphsType;
+
+/**
+ * Implements hook_install().
+ */
+function react_components_install() {
+  // Check if the paragraph type already exists.
+  $type_id = 'react_component';
+  if (!ParagraphsType::load($type_id)) {
+    $paragraph_type = ParagraphsType::create([
+      'id' => $type_id,
+      'label' => 'React Component',
+      'description' => 'A paragraph type for a react component',
+    ]);
+    $paragraph_type->save();
+  }
+
+	// define come fields 
+	$fields = [
+    'field_component_type' => [
+      'type' => 'list_string',
+      'label' => 'Component Type',
+      'description' => 'Select the type of React component to render',
+      'settings' => [
+        'allowed_values' => [
+          'hello_world' => 'Hello World',
+          'sample_component' => 'Sample Component'
+        ],
+      ],
+      'required' => TRUE,
+      'default_value' => [
+        ['value' => 'hello_world'],
+      ],
+    ],
+    'field_component_title' => [
+      'type' => 'string',
+      'label' => 'Component Title',
+      'description' => 'Optional title for the component',
+      'settings' => [
+        'max_length' => 255,
+      ],
+      'required' => FALSE,
+      'default_value' => ''
+    ],
+  ];
+
+	// create the field storage and the instances. The loop seems like a useful pattern
+	foreach ($fields as $field_name => $field_info) {
+
+		if (!FieldStorageConfig::loadByName('paragraph', $field_name)) {
+			$field_storage = FieldStorageConfig::create([
+				'field_name' => $field_name,
+				'entity_type' => 'paragraph',
+				'type' => $field_info['type'],
+				'settings' => $field_info['settings'] ?? [],
+			]);
+			$field_storage->save();
+		}
+
+		// Create field instance if it doesn't exist
+		if (!FieldConfig::loadByName('paragraph', $type_id, $field_name)) {
+			$field = FieldConfig::create([
+				'field_storage' => FieldStorageConfig::loadByName('paragraph', $field_name),
+				'bundle' => $type_id,
+				'label' => $field_info['label'],
+				'description' => $field_info['description'] ?? '',
+				'required' => $field_info['required'] ?? FALSE,
+				'settings' => $field_info['settings'] ?? [],
+        'default_value' => $field_info['default_value'] ?? ''
+			]);
+			$field->save();
+  	}
+	}
+
+	// now the fields need a form display 
+	/** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
+	$form_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('paragraph.' . $type_id . '.default');
+
+	if (!$form_display) {
+		/** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display */
+    $form_display = \Drupal::entityTypeManager()
+      ->getStorage('entity_form_display')
+      ->create([
+        'targetEntityType' => 'paragraph',
+        'bundle' => $type_id,
+        'mode' => 'default',
+        'status' => TRUE,
+      ]);
+  }
+
+	// Configure field widgets
+	$form_display->setComponent('field_component_title', [
+    'type' => 'string_textfield',
+    'weight' => 0,
+    'settings' => [
+      'size' => 60,
+      'placeholder' => 'Enter component title...',
+    ],
+  ]);
+
+  $form_display->setComponent('field_component_type', [
+    'type' => 'options_select',
+    'weight' => 1,
+    'settings' => [],
+  ]);
+
+	$form_display->save();
+
+	// now time for the view dieplay
+	/** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $view_display */
+  $view_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('paragraph.' . $type_id . '.default');
+
+	if (!$view_display) {
+    /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $view_display */
+    $view_display = \Drupal::entityTypeManager()
+      ->getStorage('entity_view_display')
+      ->create([
+        'targetEntityType' => 'paragraph',
+        'bundle' => $type_id,
+        'mode' => 'default',
+        'status' => TRUE,
+      ]);
+  }
+
+	// Hide fields in display (we'll render them via React .. actually I forgot how to do that)
+  // let's um, let's keep it in I guess lol
+  // $view_display->removeComponent('field_component_type');
+
+	// Show title if present
+  $view_display->setComponent('field_component_title', [
+    'type' => 'string',
+    'weight' => 0,
+    'label' => 'hidden',
+  ]);
+
+  // let's set the component type too
+  $view_display->setComponent('field_component_type', [
+    'type' => 'list_default',
+    'weight' => 1,
+    'label' => 'hidden',
+  ]);
+
+
+  $view_display->save();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function react_components_uninstall() {
+	$fields = [
+    'field_component_type',
+    'field_component_title',
+  ];
+
+	foreach ($fields as $field_name) {
+		$type_id = 'react_component';
+
+    $field = FieldConfig::loadByName('paragraph', $type_id, $field_name);
+    if ($field) {
+      $field->delete();
+    }
+  }
+
+	// Delete field storages (only if not used elsewhere)
+	foreach ($fields as $field_name) {
+    $field_storage = FieldStorageConfig::loadByName('paragraph', $field_name);
+    if ($field_storage && !$field_storage->isDeletable()) {
+      // Field storage is used elsewhere, don't delete
+      continue;
+    }
+    if ($field_storage) {
+      $field_storage->delete();
+    }
+  }
+
+	// Delete paragraph type
+  $paragraph_type = ParagraphsType::load($type_id);
+  if ($paragraph_type) {
+    $paragraph_type->delete();
+  }
+
+  // Delete form and view displays
+  $form_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('paragraph.'.$type_id.'.default');
+  if ($form_display) {
+    $form_display->delete();
+  }
+
+  $view_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('paragraph.'.$type_id.'.default');
+  if ($view_display) {
+    $view_display->delete();
+  }
+}
