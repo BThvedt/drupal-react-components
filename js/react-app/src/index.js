@@ -9,8 +9,6 @@ const ComponentArr = {
 }
 
 const App = ({ componentType, title }) => {
-  console.log("ComponentType is")
-  console.log(componentType)
   const Component = ComponentArr[componentType]
 
   if (!Component) {
