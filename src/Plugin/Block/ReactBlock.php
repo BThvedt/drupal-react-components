@@ -3,8 +3,6 @@ namespace Drupal\react_components\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Component\Utility\Html;
-use Drupal\Component\Uuid\Uuid;
 
 /**
  * Provides a 'ReactBlock' block.
@@ -24,7 +22,7 @@ class ReactBlock extends BlockBase {
     $build = [];
 
     $uuid = \Drupal::service('uuid')->generate();
-    $settingsKey = 'rc-block-' . $uuid; // just needs a unique key. The uuid in this key serves no other purpose
+    $settingsKey = 'rc-block-' . $uuid;
 
     $build['react_block'] = [
       '#markup' => '<div id="' . $uuid . '"></div>',
@@ -33,6 +31,9 @@ class ReactBlock extends BlockBase {
       '#attributes' => [
         'data-instance-id' => $uuid,
       ],
+      '#attached' => [
+        'library' => 'react_components/react-components-lib'
+      ]
     ];
 
     $build['react_block']['#attached']['drupalSettings']['reactComponents'][$settingsKey] = [
