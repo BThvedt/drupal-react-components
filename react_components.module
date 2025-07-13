@@ -35,7 +35,7 @@ function react_components_preprocess_paragraph__react_component(array &$variable
   $paragraph = $variables['elements']['#paragraph'];
   $uuid = $paragraph->uuid();
 
-  $settingsKey = 'rc-paragraph-' . $uuid; // just needs a unique key. The uuid in this key serves no other purpose
+  $settingsKey = 'rc-paragraph-' . $uuid;
 
   $variables['#attached']['drupalSettings']['reactComponents'][$settingsKey] = [
     'paragraph_uuid' => $uuid,

@@ -1,7 +1,12 @@
 import React from "react";
 
-function SampleComponent() {
-  return <h1>Sample Component</h1>;
+function SampleComponent({ title }) {
+  return (
+    <>
+      <h3>Sample Component</h3>
+      {title ? <p>title is: {title}</p> : ""}
+    </>
+  );
 }
 
 export default SampleComponent;
