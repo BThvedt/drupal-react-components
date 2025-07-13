@@ -1,0 +1,49 @@
+<?php
+/**
+ * Implements hook_page_attachments_alter().
+ */
+// function react_components_page_attachments_alter(array &$attachments) {
+//   // Debug what libraries are attached
+//   if (isset($attachments['#attached']['library'])) {
+//     \Drupal::logger('react_components')->notice('Libraries attached: @libs', [
+//       '@libs' => implode(', ', $attachments['#attached']['library'])
+//     ]);
+//   }
+// }
+
+function react_components_theme($existing, $type, $theme, $path) {
+  $module_path = \Drupal::service('extension.list.module')->getPath('react_components');
+
+  return [
+    'react_block' => [
+      'render element' => 'content',
+      'template' => 'react-block', // Maps to your-custom-block.html.twig
+      'path' => $module_path . '/templates',
+      'variables' => [
+        'uuid' => '',
+      ],
+    ],
+    'paragraph__react_component' => [
+      'render element' => 'elements',
+      'path' => $module_path . '/templates',
+      'template' => 'paragraph--react-component',
+    ],
+  ];
+}
+
+function react_components_preprocess_paragraph__react_component(array &$variables) {
+  $paragraph = $variables['elements']['#paragraph'];
+  $uuid = $paragraph->uuid();
+
+  $settingsKey = 'rc-paragraph-' . $uuid; // just needs a unique key. The uuid in this key serves no other purpose
+
+  $variables['#attached']['drupalSettings']['reactComponents'][$settingsKey] = [
+    'paragraph_uuid' => $uuid,
+    'componentType' => $paragraph->get('field_component_type')->value,
+    'title' => $paragraph->get('field_component_title')->value
+  ];
+
+  $variables['uuid'] = $uuid;
+
+  $variables['#attached']['library'][] = 'react_components/react-components-lib';
+}
