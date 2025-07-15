@@ -1,4 +1,4 @@
 react-components-lib:
   version: 1.x
   js:
-    js/react-app/dist/app.bundle.js: {}
+    js/react-app/app_bundle/app.bundle.js: {}
