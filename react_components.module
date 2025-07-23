@@ -45,5 +45,5 @@ function react_components_preprocess_paragraph__react_component(array &$variable
 
   $variables['uuid'] = $uuid;
 
-  $variables['#attached']['library'][] = 'react_components/react-components-lib';
+  $variables['#attached']['library'][] = ['react_components/react-components-lib'];
 }
