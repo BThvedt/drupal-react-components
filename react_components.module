@@ -47,3 +47,20 @@ function react_components_preprocess_paragraph__react_component(array &$variable
 
   $variables['#attached']['library'][] = ['react_components/react-components-lib'];
 }
+
+// let's give the block a custom id based on the title
+function react_components_preprocess_block(&$variables) {
+  $plugin_id = $variables['elements']['#plugin_id'];
+
+  if ($plugin_id == 'react_block') {
+
+    if (!empty($variables['configuration']['component_title'])) {
+      $title = $variables['configuration']['component_title'];
+      $id = strtolower($title);
+      $id = trim($id);
+      $id = preg_replace('/[^a-z0-9]+/', '-', $id);
+      $id = 'rcb-' . $id;
+      $variables['attributes']['id']  = $id;
+    }
+  }
+}

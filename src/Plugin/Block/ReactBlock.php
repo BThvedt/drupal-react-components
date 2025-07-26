@@ -90,4 +90,17 @@ class ReactBlock extends BlockBase {
     $this->configuration['component_type'] = $form_state->getValue('component_type');
     $this->configuration['component_title'] = $form_state->getValue('component_title');
   }
+
+  // Uncomment these if adding a new component doesn't work
+  // public function getCacheMaxAge() {
+  //   return 0; // Temporarily disable caching
+  // }
+
+  // public function getCacheContexts() {
+  //   return ['url.path']; // Add cache contexts as needed
+  // }
+
+  // public function getCacheTags() {
+  //   return ['your_module:debug']; // Add cache tags
+  // }
 }
