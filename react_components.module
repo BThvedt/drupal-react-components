@@ -45,7 +45,7 @@ function react_components_preprocess_paragraph__react_component(array &$variable
 
   $variables['uuid'] = $uuid;
 
-  $variables['#attached']['library'][] = ['react_components/react-components-lib'];
+  // $variables['#attached']['library'][] = ['react_components/react-components-lib'];
 }
 
 // let's give the block a custom id based on the title
@@ -63,4 +63,9 @@ function react_components_preprocess_block(&$variables) {
       $variables['attributes']['id']  = $id;
     }
   }
+}
+
+function react_components_preprocess_page(&$variables) { 
+  // for some reason this is the only thing that gets around bigpipe for me right now
+  $variables['#attached']['library'][] = 'react_components/react-components-lib';
 }

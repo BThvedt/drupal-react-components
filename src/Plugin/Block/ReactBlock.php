@@ -101,6 +101,6 @@ class ReactBlock extends BlockBase {
   // }
 
   // public function getCacheTags() {
-  //   return ['your_module:debug']; // Add cache tags
+  //   return ['react_components:debug']; // Add cache tags
   // }
 }
