@@ -32,7 +32,7 @@ class ReactBlock extends BlockBase {
         'data-instance-id' => $uuid,
       ],
       '#attached' => [
-        'library' => 'react_components/react-components-lib'
+        'library' => ['react_components/react-components-lib']
       ]
     ];
 
