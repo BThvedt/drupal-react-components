@@ -4,5 +4,4 @@ react-components-lib:
     js/react-app/app_bundle/app.bundle.js: {}
   dependencies:
     - core/drupal
-    - core/drupalSettings
     - core/jquery
